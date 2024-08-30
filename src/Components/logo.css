@@ -1,0 +1,22 @@
+.logo {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.logo_img {
+    height: 50px;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+    .logo {
+        padding: 0;
+    }
+
+    .logo_img {
+        height: 30px;
+    }
+}

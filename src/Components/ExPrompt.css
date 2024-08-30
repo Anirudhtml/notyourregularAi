@@ -1,0 +1,54 @@
+.PromptWrapper {
+  padding: 20px;
+}
+
+.prompts {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+  font-size: small;
+  flex-wrap: wrap; /* Allow wrapping of items */
+}
+
+.prompt {
+  width: 100px;
+  border: 1px solid rgba(127, 127, 127, 0.467);
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 3px 3px 21px -8px rgba(39, 39, 39, 0.358);
+}
+
+.prompt:hover {
+  background-color: rgba(171, 171, 171, 0.259);
+  cursor: pointer;
+}
+
+/* For devices with max-width of 768px */
+@media (max-width: 768px) {
+  .prompts {
+    gap: 15px;
+  }
+
+  .prompt {
+    width: 45%; /* Two items per row */
+    margin-bottom: 15px; /* Space between rows */
+  }
+}
+
+/* For devices with max-width of 400px */
+@media (max-width: 400px) {
+  .prompts {
+    gap: 10px;
+  }
+
+  .prompt {
+    width: 45%; /* Keep the two items per row layout */
+    margin-bottom: 10px; /* Smaller space between rows */
+  }
+}

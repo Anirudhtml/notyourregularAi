@@ -1,0 +1,39 @@
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 10px 0;
+  }
+  
+  .bubble {
+    width: 50px;
+    height: 45px;
+    background-color: #e5e5ea;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+  }
+  
+  .dot {
+    width: 6px;
+    height: 6px;
+    background-color: #1e1e1e;
+    border-radius: 50%;
+    margin: 4 1px;
+    animation: typing 1.5s infinite;
+  }
+  
+  @keyframes typing {
+    0% {
+      opacity: 0.2;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.2;
+    }
+  }
+  

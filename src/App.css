@@ -1,0 +1,96 @@
+.App {
+  text-align: center;
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.LeftBarContainer {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  align-items: flex-start;
+  transition: width 300ms ease-in-out;
+}
+
+.LeftBar {
+  box-shadow: inset 2px 5px 10px rgba(25, 25, 25, 0.3);
+  transition: 300ms ease-in-out;
+  background-color: #b6b6b66f;
+  border-radius: 0% 20px 0% 0%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin-top: 60px;
+  width: 90%;
+}
+
+.RightBar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 300ms ease-in-out;
+  overflow-y: auto;
+  margin-top: 60px;
+}
+
+
+.logoAndHamburger {
+  display: flex;
+  align-items: center;
+  position: fixed; 
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 60px;
+}
+
+.hide .LeftBarContainer {
+  width: 0;
+  overflow: hidden;
+}
+
+.hide .RightBar {
+  margin-left: 0;
+}
+
+.hide .LeftBar {
+  margin-left: -300px;
+}
+
+@media (max-width: 768px) {
+  .App {
+    flex-direction: column;
+  }
+
+  .LeftBarContainer {
+    width: 100%;
+    height: auto;
+  }
+
+  .LeftBar {
+    margin-top: 60px;
+    border-radius: 0;
+  }
+
+  .RightBar {
+    margin-left: 0 !important;
+  }
+
+  .logoAndHamburger {
+    gap: 50px;
+    background-color: rgba(245, 245, 245, 0.572);
+  }
+
+  .hide .LeftBarContainer {
+    height: 0;
+    overflow: hidden;
+  }
+
+  .hide .LeftBar {
+    display: none;
+  }
+}

@@ -1,0 +1,140 @@
+.ChatBox {
+  max-width: 80%;
+  margin: 20px auto;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+.ChatWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 70vh;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.chat {
+  display: flex;
+  align-items: center;
+}
+
+.textWrapper {
+  text-align: start;
+  padding: 15px;
+  border-radius: 12px;
+  max-width: 100%;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+
+.user {
+  justify-content: flex-end;
+}
+
+.user-chat {
+  list-style: none;
+}
+
+.assistant {
+  justify-content: flex-start;
+}
+
+.assistanttext {
+  box-shadow: inset 2px 5px 10px rgba(25, 25, 25, 0.3);
+  transition: 300ms ease-in-out;
+  background-color: #cbcbcb6f;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.usertext {
+  box-shadow: inset 2px 5px 10px rgba(25, 25, 25, 0.3);
+  transition: 300ms ease-in-out;
+  background-color: #f927149a;
+  border-radius: 30px;
+  color: rgb(255, 255, 255);
+}
+
+.chat-content {
+  padding: 10px 15px;
+  border-radius: 20px;
+  background-color: #e0e0e0;
+  max-width: 100%;
+  font-size: 14px;
+}
+
+.user .chat-content {
+  background-color: #007bff;
+  color: white;
+  text-align: right;
+}
+
+.assistant .chat-content {
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+.no-content {
+  text-align: center;
+  color: #888;
+  font-size: 16px;
+}
+
+.typing-animation {
+  display: inline-block;
+  position: relative;
+}
+
+.typing-animation::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 5px;
+  height: 1em;
+  background-color: black;
+  animation: blink 1s infinite;
+}
+
+.typing-animation span {
+  font-size: larger;
+  color: rgb(82, 82, 82);
+}
+
+.ai-img {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .ChatWrapper {
+    padding: 10px;
+  }
+
+  .textWrapper {
+    padding: 10px;
+  }
+
+  .ChatBox {
+    max-width: 100%;
+  }
+
+  .chat-content {
+    font-size: 12px;
+  }
+
+  .ai-img {
+    height: 24px;
+    width: 24px;
+  }
+}

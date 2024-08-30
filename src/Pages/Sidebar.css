@@ -1,0 +1,95 @@
+.Sidebar {
+    font-size: small;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.subItems {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.SidebarItems {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+    border-radius: 10px;
+    color: rgb(36, 36, 36);
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    margin-bottom: 8px;
+}
+
+
+.SidebarItems div p {
+    text-decoration: none;
+    color: inherit;
+    margin: 0;
+}
+
+.subContent {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+    align-items: center;
+}
+
+#chatTitle {
+    text-decoration: none;
+    color: black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 1024px) {
+    .Sidebar {
+        max-width: 250px;
+        padding: 10px;
+    }
+
+    .SidebarItems {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .Sidebar {
+        max-width: 200px;
+        padding: 8px;
+    }
+
+    .SidebarItems {
+        font-size: 13px;
+        padding: 8px;
+    }
+    .subContent {
+        width: 350px;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .Sidebar {
+        max-width: 100%;
+        padding: 8px;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .SidebarItems {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
