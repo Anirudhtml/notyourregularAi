@@ -1,23 +1,18 @@
 import "./Chat_section.css";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ChatBox from "./ChatBox";
 import Popup from "./Popup";
-import Loading from "./Loading";
 import ExPrompt from "./ExPrompt";
 
 const ChatSection = ({ user, setUser }) => {
   const [userInput, setUserInput] = useState("");
-  const [fetching, setFetching] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [isClicked, setisClicked] = useState(false);
   const [title, setTitle] = useState("");
 
-  useEffect(() => {
-    fetchChatHistory();
-  }, []);
-
-  const fetchChatHistory = async () => {
+  // Wrap fetchChatHistory with useCallback
+  const fetchChatHistory = useCallback(async () => {
     try {
       const response = await axios.get("http://localhost:4000/user/profile", {
         withCredentials: true,
@@ -29,30 +24,36 @@ const ChatSection = ({ user, setUser }) => {
     } catch (err) {
       console.log(err);
     }
+  }, [setUser]); // Only redefine if setUser changes
+
+  useEffect(() => {
+    fetchChatHistory();
+  }, [fetchChatHistory]); // Now this won't trigger on every render
+
+  const handleNew = () => {
+    setisClicked((prevState) => !prevState);
   };
 
-  function handleNew() {
-    setisClicked(!isClicked);
-  }
-
-  async function handleTitleClick() {
+  const handleTitleClick = async () => {
     setisClicked(false);
     if (title.length > 0) {
-      const response = await axios.post(
-        "http://localhost:4000/user/clear-chat",
-        { title: title, chats: user.user ? user.user.chatHistory : [] },
-        { withCredentials: true }
-      );
-      console.log(response.data);
-      console.log(user);
-      await fetchChatHistory();
+      try {
+        const response = await axios.post(
+          "http://localhost:4000/user/clear-chat",
+          { title: title, chats: user.user ? user.user.chatHistory : [] },
+          { withCredentials: true }
+        );
+        console.log(response.data);
+        await fetchChatHistory(); // Use the function here as well
+      } catch (err) {
+        console.log(err);
+      }
     } else {
       alert("Enter the title");
     }
-  }
+  };
 
-  async function handleClick(userInput) {
-    setFetching(true);
+  const handleClick = async (userInput) => {
     setIsTyping(true);
     try {
       const response = await axios.post(
@@ -63,20 +64,23 @@ const ChatSection = ({ user, setUser }) => {
 
       if (response.data.ok) {
         setUserInput("");
-        await fetchChatHistory();
-        setIsTyping(false);
+        await fetchChatHistory(); // Use the function here as well
       }
     } catch (err) {
       console.log(err);
-      setIsTyping(false);
     } finally {
-      setFetching(false);
+      setIsTyping(false);
     }
-  }
+  };
 
-  function handleSubmit(e) {
+  const handleInputChange = (e) => {
+    setUserInput(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-  }
+    handleClick(userInput);
+  };
 
   return (
     <>
@@ -84,9 +88,7 @@ const ChatSection = ({ user, setUser }) => {
       <div className="chat-Input">
         <form onSubmit={handleSubmit} className="message-input">
           <input
-            onChange={(e) => {
-              setUserInput(e.target.value);
-            }}
+            onChange={handleInputChange}
             value={userInput}
             type="text"
             autoComplete="off"
@@ -94,10 +96,8 @@ const ChatSection = ({ user, setUser }) => {
             className="input"
             placeholder="Go ahead..."
           />
-          <button type="submit" onClick={() => handleClick(userInput)}>
-            Ask
-          </button>
-          <button onClick={handleNew}>
+          <button type="submit">Ask</button>
+          <button type="button" onClick={handleNew}>
             {isClicked ? `Cancel` : "Save and Clear"}
           </button>
         </form>
