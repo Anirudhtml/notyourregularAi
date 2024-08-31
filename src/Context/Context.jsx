@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
   const navigate = useNavigate();
-
+  
   // Clear error message after 3 seconds
   useEffect(() => {
     if (err) {
@@ -27,35 +27,25 @@ export function AuthProvider({ children }) {
     }
   }, [err]);
 
-  // Set token if available in localStorage
+  // Check if user is logged in when the component mounts
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setisLoggedIn(true);
-    }
-  }, []);
-
-  // Fetch user profile if logged in
-  useEffect(() => {
-    if (isLoggedIn) {
+    if (!isLoggedIn) {
       setLoading(true);
       axios
-        .get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile")
+        .get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", { withCredentials: true })
         .then(({ data }) => {
           if (data.ok) {
             setUser(data);
+            setisLoggedIn(true);
           } else {
             setUser(null);
             setisLoggedIn(false);
-            localStorage.removeItem("token");
           }
         })
         .catch((err) => {
           console.log(err);
           setUser(null);
           setisLoggedIn(false);
-          localStorage.removeItem("token");
         })
         .finally(() => {
           setLoading(false);
@@ -63,58 +53,12 @@ export function AuthProvider({ children }) {
     }
   }, [isLoggedIn]);
 
-  // Handle user login
-  async function login(credentials) {
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/login",
-        credentials
-      );
-      const data = response.data;
-
-      if (data.ok) {
-        localStorage.setItem("token", data.token);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-        setUser({
-          email: credentials.email,
-          name: data.name,
-        });
-        setisLoggedIn(true);
-        navigate("/");
-      } else {
-        console.log("Could not fetch the data", data.message);
-        setisLoggedIn(false);
-        setErr("Check your credentials again");
-      }
-    } catch (err) {
-      console.log("ERROR logging in", err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // Handle user logout
-  async function logout() {
-    setLoading(true);
-    try {
-      localStorage.removeItem("token");
-      delete axios.defaults.headers.common["Authorization"];
-      setUser(null);
-      setisLoggedIn(false);
-    } catch (err) {
-      console.log("ERROR logging out", err);
-    } finally {
-      setLoading(false);
-      navigate("/login");
-    }
-  }
-
   // Fetch chat data based on user ID
   async function fetchChat(id) {
     try {
       const response = await axios.get(
-        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/chat/${id}`
+        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/chat/${id}`,
+        { withCredentials: true }
       );
       if (response.data.ok) {
         setChat(response.data.chat.chats);
@@ -127,15 +71,56 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Handle user login
+  async function login(credentials) {
+    setLoading(true);
+    try {
+      const response = await fetch("https://notyourregularai-a10447bffa4b.herokuapp.com/user/login", {
+        method: "POST",
+        credentials: "include", // Include cookies in the request
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (data.ok) {
+        setUser({
+          email: credentials.email,
+          name: data.name,
+          chatHistory: data.chatHistory,
+        });
+        setisLoggedIn(true);
+        navigate("/");
+        window.location.reload(); // Reload the page to reflect login state
+      } else {
+        console.log("Could not fetch the data", data.message);
+        setisLoggedIn(false);
+        setErr("Check your credentials again");
+      }
+    } catch (err) {
+      console.log("ERROR logging in", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   // Handle user signup
   async function signup(credentials) {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/signup",
-        credentials
-      );
-      const data = response.data;
+      const response = await fetch("https://notyourregularai-a10447bffa4b.herokuapp.com/user/signup", {
+        method: "POST",
+        credentials: "include", // Include cookies in the request
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
 
       if (data.ok) {
         navigate("/login");
@@ -150,12 +135,35 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Handle user logout
+  async function logout() {
+    setLoading(true);
+    try {
+      const response = await axios.get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/logout", {
+        withCredentials: true, // Include cookies in the request
+      });
+
+      if (response.data.ok) {
+        setUser(null);
+        setisLoggedIn(false);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (err) {
+      console.log("ERROR logging out", err);
+    } finally {
+      setLoading(false);
+      navigate("/login");
+    }
+  }
+
   // Handle chat deletion
   async function handleDelete(id) {
     setLoading(true);
     try {
       const response = await axios.delete(
-        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/delete/${id}`
+        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/delete/${id}`,
+        { withCredentials: true } // Include cookies in the request
       );
 
       if (response.data.ok) {
@@ -179,7 +187,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   }
-
+  
   return (
     <AuthContext.Provider
       value={{
