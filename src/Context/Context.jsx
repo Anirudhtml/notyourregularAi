@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
     if (!isLoggedIn) {
       setLoading(true);
       axios
-        .get("http://localhost:4000/user/profile", { withCredentials: true })
+        .get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", { withCredentials: true })
         .then(({ data }) => {
           if (data.ok) {
             setUser(data);
@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
   async function fetchChat(id) {
     try {
       const response = await axios.get(
-        `http://localhost:4000/user/chat/${id}`,
+        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/chat/${id}`,
         { withCredentials: true }
       );
       if (response.data.ok) {
@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
   async function login(credentials) {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/user/login", {
+      const response = await fetch("https://notyourregularai-a10447bffa4b.herokuapp.com/user/login", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -107,7 +107,7 @@ export function AuthProvider({ children }) {
   async function signup(credentials) {
     setLoading(true); // Start loading
     try {
-      const response = await fetch("http://localhost:4000/user/signup", {
+      const response = await fetch("https://notyourregularai-a10447bffa4b.herokuapp.com/user/signup", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -134,7 +134,7 @@ export function AuthProvider({ children }) {
   async function logout() {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:4000/user/logout", {
+      const response = await axios.get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/logout", {
         withCredentials: true,
       });
 
@@ -156,7 +156,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const response = await axios.delete(
-        `http://localhost:4000/user/delete/${id}`,
+        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/delete/${id}`,
         { withCredentials: true }
       );
   

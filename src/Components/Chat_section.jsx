@@ -14,7 +14,7 @@ const ChatSection = ({ user, setUser }) => {
   // Wrap fetchChatHistory with useCallback
   const fetchChatHistory = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:4000/user/profile", {
+      const response = await axios.get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", {
         withCredentials: true,
       });
 
@@ -39,7 +39,7 @@ const ChatSection = ({ user, setUser }) => {
     if (title.length > 0) {
       try {
         const response = await axios.post(
-          "http://localhost:4000/user/clear-chat",
+          "https://notyourregularai-a10447bffa4b.herokuapp.com/user/clear-chat",
           { title: title, chats: user.user ? user.user.chatHistory : [] },
           { withCredentials: true }
         );
@@ -57,7 +57,7 @@ const ChatSection = ({ user, setUser }) => {
     setIsTyping(true);
     try {
       const response = await axios.post(
-        "http://localhost:4000/user/query",
+        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/query",
         { prompt: userInput },
         { withCredentials: true }
       );
