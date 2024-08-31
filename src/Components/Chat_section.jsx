@@ -5,18 +5,22 @@ import ChatBox from "./ChatBox";
 import Popup from "./Popup";
 import ExPrompt from "./ExPrompt";
 
+const getAuthHeader = () => ({
+  headers: { Authorization: localStorage.getItem("token") },
+});
+
 const ChatSection = ({ user, setUser }) => {
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isClicked, setisClicked] = useState(false);
   const [title, setTitle] = useState("");
 
-  // Wrap fetchChatHistory with useCallback
   const fetchChatHistory = useCallback(async () => {
     try {
-      const response = await axios.get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile",
+        getAuthHeader()
+      );
 
       if (response.data.ok) {
         setUser(response.data);
@@ -24,11 +28,11 @@ const ChatSection = ({ user, setUser }) => {
     } catch (err) {
       console.log(err);
     }
-  }, [setUser]); // Only redefine if setUser changes
+  }, [setUser]);
 
   useEffect(() => {
     fetchChatHistory();
-  }, [fetchChatHistory]); // Now this won't trigger on every render
+  }, [fetchChatHistory]);
 
   const handleNew = () => {
     setisClicked((prevState) => !prevState);
@@ -41,10 +45,10 @@ const ChatSection = ({ user, setUser }) => {
         const response = await axios.post(
           "https://notyourregularai-a10447bffa4b.herokuapp.com/user/clear-chat",
           { title: title, chats: user.user ? user.user.chatHistory : [] },
-          { withCredentials: true }
+          getAuthHeader()
         );
         console.log(response.data);
-        await fetchChatHistory(); // Use the function here as well
+        await fetchChatHistory();
       } catch (err) {
         console.log(err);
       }
@@ -59,12 +63,12 @@ const ChatSection = ({ user, setUser }) => {
       const response = await axios.post(
         "https://notyourregularai-a10447bffa4b.herokuapp.com/user/query",
         { prompt: userInput },
-        { withCredentials: true }
+        getAuthHeader()
       );
 
       if (response.data.ok) {
         setUserInput("");
-        await fetchChatHistory(); // Use the function here as well
+        await fetchChatHistory();
       }
     } catch (err) {
       console.log(err);
@@ -112,10 +116,16 @@ const ChatSection = ({ user, setUser }) => {
         )}
       </div>
       <div>
-        {user.user && user.user.chatHistory && user.user.chatHistory.length > 0 ? (
+        {user.user &&
+        user.user.chatHistory &&
+        user.user.chatHistory.length > 0 ? (
           ""
         ) : (
-          <ExPrompt setIsTyping={setIsTyping} user={user} handleClick={handleClick} />
+          <ExPrompt
+            setIsTyping={setIsTyping}
+            user={user}
+            handleClick={handleClick}
+          />
         )}
       </div>
     </>
