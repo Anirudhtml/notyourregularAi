@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
   const [err, setErr] = useState(null);
   const navigate = useNavigate();
 
+  // Clear error message after 3 seconds
   useEffect(() => {
     if (err) {
       const timer = setTimeout(() => {
@@ -26,14 +27,16 @@ export function AuthProvider({ children }) {
     }
   }, [err]);
 
+  // Set token if available in localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      axios.defaults.headers.common["Authorization"] = token;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setisLoggedIn(true);
     }
   }, []);
 
+  // Fetch user profile if logged in
   useEffect(() => {
     if (isLoggedIn) {
       setLoading(true);
@@ -60,6 +63,7 @@ export function AuthProvider({ children }) {
     }
   }, [isLoggedIn]);
 
+  // Handle user login
   async function login(credentials) {
     setLoading(true);
     try {
@@ -71,7 +75,7 @@ export function AuthProvider({ children }) {
 
       if (data.ok) {
         localStorage.setItem("token", data.token);
-        axios.defaults.headers.common["Authorization"] = data.token;
+        axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
         setUser({
           email: credentials.email,
           name: data.name,
@@ -79,7 +83,7 @@ export function AuthProvider({ children }) {
         setisLoggedIn(true);
         navigate("/");
       } else {
-        console.log("could not fetch the data", data.message);
+        console.log("Could not fetch the data", data.message);
         setisLoggedIn(false);
         setErr("Check your credentials again");
       }
@@ -90,6 +94,7 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Handle user logout
   async function logout() {
     setLoading(true);
     try {
@@ -105,12 +110,52 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Fetch chat data based on user ID
+  async function fetchChat(id) {
+    try {
+      const response = await axios.get(
+        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/chat/${id}`
+      );
+      if (response.data.ok) {
+        setChat(response.data.chat.chats);
+      } else {
+        setErr("No data found");
+        console.log("No data found");
+      }
+    } catch (err) {
+      console.log("Fetching error", err);
+    }
+  }
+
+  // Handle user signup
+  async function signup(credentials) {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/signup",
+        credentials
+      );
+      const data = response.data;
+
+      if (data.ok) {
+        navigate("/login");
+      } else {
+        console.log(data.message);
+        setErr(data.message);
+      }
+    } catch (err) {
+      console.log("ERROR signing up", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Handle chat deletion
   async function handleDelete(id) {
     setLoading(true);
     try {
       const response = await axios.delete(
-        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/delete/${id}`,
-        { withCredentials: true }
+        `https://notyourregularai-a10447bffa4b.herokuapp.com/user/delete/${id}`
       );
 
       if (response.data.ok) {
