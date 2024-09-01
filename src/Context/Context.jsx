@@ -9,7 +9,7 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [chat, setChat] = useState([]);
-  const [isLoggedIn, setisLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
   const navigate = useNavigate();
@@ -21,44 +21,44 @@ export function AuthProvider({ children }) {
         setErr(null);
       }, 3000);
 
-      return () => {
-        clearTimeout(timer);
-      };
+      return () => clearTimeout(timer);
     }
   }, [err]);
 
   // Check if user is logged in when the component mounts
   useEffect(() => {
-    if (!isLoggedIn) {
+    const checkAuth = async () => {
       setLoading(true);
-      axios
-        .get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", { withCredentials: true, credentials: "include" })
-        .then(({ data }) => {
-          if (data.ok) {
-            setUser(data);
-            setisLoggedIn(true);
-          } else {
-            setUser(null);
-            setisLoggedIn(false);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
+      try {
+        const { data } = await axios.get(
+          "https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile",
+          { withCredentials: true }
+        );
+        if (data.ok) {
+          setUser(data);
+          setIsLoggedIn(true);
+        } else {
           setUser(null);
-          setisLoggedIn(false);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [isLoggedIn]);
+          setIsLoggedIn(false);
+        }
+      } catch (err) {
+        console.log(err);
+        setUser(null);
+        setIsLoggedIn(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   // Fetch chat data based on user ID
   async function fetchChat(id) {
     try {
       const response = await axios.get(
         `https://notyourregularai-a10447bffa4b.herokuapp.com/user/chat/${id}`,
-        { withCredentials: true, credentials: "include" }
+        { withCredentials: true }
       );
       if (response.data.ok) {
         setChat(response.data.chat.chats);
@@ -71,58 +71,58 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // Handle user login
   async function login(credentials) {
     setLoading(true);
     try {
-      // Making a POST request to the login endpoint
       const response = await axios.post(
         "https://notyourregularai-a10447bffa4b.herokuapp.com/user/login",
         credentials, // Request payload
         {
           withCredentials: true,
-          credentials: "include", // Include cookies in the request
           headers: {
             "Content-Type": "application/json", // Set content type
           },
         }
       );
   
-      // Handling the response
       if (response.data.ok) {
-        // Update user state on successful login
         setUser({
           email: credentials.email,
           name: response.data.name,
           chatHistory: response.data.chatHistory,
         });
-        setisLoggedIn(true);
+        setIsLoggedIn(true);
         navigate("/"); // Navigate to the home page
       } else {
         console.log("Could not fetch the data", response.data.message);
-        setisLoggedIn(false);
+        setIsLoggedIn(false);
         setErr("Check your credentials again");
       }
     } catch (err) {
       console.log("ERROR logging in", err);
       setErr("An error occurred while logging in");
-      setisLoggedIn(false);
+      setIsLoggedIn(false);
     } finally {
       setLoading(false);
     }
   }
   
-
+  // Handle user signup
   async function signup(credentials) {
     setLoading(true);
     try {
-      const response = await fetch("https://notyourregularai-a10447bffa4b.herokuapp.com/user/signup", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
+      const response = await fetch(
+        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/signup",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(credentials),
+        }
+      );
 
       const data = await response.json();
 
@@ -143,14 +143,14 @@ export function AuthProvider({ children }) {
   async function logout() {
     setLoading(true);
     try {
-      const response = await axios.get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/logout", {
-        withCredentials: true, 
-        credentials: "include",// Include cookies in the request
-      });
+      const response = await axios.get(
+        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/logout",
+        { withCredentials: true }
+      );
 
       if (response.data.ok) {
         setUser(null);
-        setisLoggedIn(false);
+        setIsLoggedIn(false);
       } else {
         console.log(response.data.message);
       }
@@ -168,21 +168,18 @@ export function AuthProvider({ children }) {
     try {
       const response = await axios.delete(
         `https://notyourregularai-a10447bffa4b.herokuapp.com/user/delete/${id}`,
-        { withCredentials: true } // Include cookies in the request
+        { withCredentials: true }
       );
 
       if (response.data.ok) {
         setUser((prevUser) => {
-          const updatedChats = prevUser?.user?.savedChats?.filter(
+          const updatedChats = prevUser?.savedChats?.filter(
             (chat) => chat._id !== id
           );
 
           return {
             ...prevUser,
-            user: {
-              ...prevUser.user,
-              savedChats: updatedChats || [],
-            },
+            savedChats: updatedChats || [],
           };
         });
       }
