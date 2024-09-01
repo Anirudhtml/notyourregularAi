@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
     if (!isLoggedIn) {
       setLoading(true);
       axios
-        .get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", { withCredentials: true })
+        .get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", { withCredentials: true, credentials: "include" })
         .then(({ data }) => {
           if (data.ok) {
             setUser(data);
@@ -58,7 +58,7 @@ export function AuthProvider({ children }) {
     try {
       const response = await axios.get(
         `https://notyourregularai-a10447bffa4b.herokuapp.com/user/chat/${id}`,
-        { withCredentials: true }
+        { withCredentials: true, credentials: "include" }
       );
       if (response.data.ok) {
         setChat(response.data.chat.chats);
@@ -71,49 +71,53 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // Handle user login
   async function login(credentials) {
     setLoading(true);
     try {
-      const response = await fetch("https://notyourregularai-a10447bffa4b.herokuapp.com/user/login", {
-        method: "POST",
-        credentials: "include", // Include cookies in the request
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-
-      if (data.ok) {
+      // Making a POST request to the login endpoint
+      const response = await axios.post(
+        "https://notyourregularai-a10447bffa4b.herokuapp.com/user/login",
+        credentials, // Request payload
+        {
+          withCredentials: true,
+          credentials: "include", // Include cookies in the request
+          headers: {
+            "Content-Type": "application/json", // Set content type
+          },
+        }
+      );
+  
+      // Handling the response
+      if (response.data.ok) {
+        // Update user state on successful login
         setUser({
           email: credentials.email,
-          name: data.name,
-          chatHistory: data.chatHistory,
+          name: response.data.name,
+          chatHistory: response.data.chatHistory,
         });
         setisLoggedIn(true);
-        navigate("/");
-        window.location.reload(); // Reload the page to reflect login state
+        navigate("/"); // Navigate to the home page
       } else {
-        console.log("Could not fetch the data", data.message);
+        console.log("Could not fetch the data", response.data.message);
         setisLoggedIn(false);
         setErr("Check your credentials again");
       }
     } catch (err) {
       console.log("ERROR logging in", err);
+      setErr("An error occurred while logging in");
+      setisLoggedIn(false);
     } finally {
       setLoading(false);
     }
   }
+  
 
-  // Handle user signup
   async function signup(credentials) {
     setLoading(true);
     try {
       const response = await fetch("https://notyourregularai-a10447bffa4b.herokuapp.com/user/signup", {
         method: "POST",
-        credentials: "include", // Include cookies in the request
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -140,7 +144,8 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const response = await axios.get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/logout", {
-        withCredentials: true, // Include cookies in the request
+        withCredentials: true, 
+        credentials: "include",// Include cookies in the request
       });
 
       if (response.data.ok) {

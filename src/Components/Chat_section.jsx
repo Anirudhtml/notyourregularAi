@@ -16,6 +16,7 @@ const ChatSection = ({ user, setUser }) => {
     try {
       const response = await axios.get("https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile", {
         withCredentials: true,
+        credentials: "include"
       });
 
       if (response.data.ok) {
@@ -41,7 +42,7 @@ const ChatSection = ({ user, setUser }) => {
         const response = await axios.post(
           "https://notyourregularai-a10447bffa4b.herokuapp.com/user/clear-chat",
           { title: title, chats: user.user ? user.user.chatHistory : [] },
-          { withCredentials: true }
+          { withCredentials: true, credentials: "include"}
         );
         console.log(response.data);
         await fetchChatHistory(); // Use the function here as well
