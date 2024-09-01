@@ -1,5 +1,4 @@
 import "./Chat_section.css";
-import axios from "axios";
 import { useState, useEffect, useCallback } from "react";
 import ChatBox from "./ChatBox";
 import Popup from "./Popup";
@@ -13,15 +12,17 @@ const ChatSection = ({ user, setUser }) => {
 
   const fetchChatHistory = useCallback(async () => {
     try {
-      const response = await axios.get(
+      const response = await fetch(
         "https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile",
         {
-          withCredentials: true,
+          method: "GET",
+          credentials: "include",
         }
       );
+      const data = await response.json();
 
-      if (response.data.ok) {
-        setUser(response.data);
+      if (data.ok) {
+        setUser(data);
       }
     } catch (err) {
       console.log(err);
@@ -40,12 +41,22 @@ const ChatSection = ({ user, setUser }) => {
     setisClicked(false);
     if (title.length > 0) {
       try {
-        const response = await axios.post(
+        const response = await fetch(
           "https://notyourregularai-a10447bffa4b.herokuapp.com/user/clear-chat",
-          { title: title, chats: user.user ? user.user.chatHistory : [] },
-          { withCredentials: true }
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: title,
+              chats: user.user ? user.user.chatHistory : [],
+            }),
+          }
         );
-        console.log(response.data);
+        const data = await response.json();
+        console.log(data);
         await fetchChatHistory(); // Use the function here as well
       } catch (err) {
         console.log(err);
@@ -58,13 +69,20 @@ const ChatSection = ({ user, setUser }) => {
   const handleClick = async (userInput) => {
     setIsTyping(true);
     try {
-      const response = await axios.post(
+      const response = await fetch(
         "https://notyourregularai-a10447bffa4b.herokuapp.com/user/query",
-        { prompt: userInput },
-        { withCredentials: true }
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: userInput }),
+        }
       );
+      const data = await response.json();
 
-      if (response.data.ok) {
+      if (data.ok) {
         setUserInput("");
         await fetchChatHistory(); // Use the function here as well
       }

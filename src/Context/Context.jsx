@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Loading from "../Components/Loading";
 import Error from "../Components/Error";
 
@@ -30,10 +29,15 @@ export function AuthProvider({ children }) {
     const checkAuth = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(
+        const response = await fetch(
           "https://notyourregularai-a10447bffa4b.herokuapp.com/user/profile",
-          { withCredentials: true }
+          {
+            method: "GET",
+            credentials: "include",
+          }
         );
+        const data = await response.json();
+
         if (data.ok) {
           setUser(data);
           setIsLoggedIn(true);
@@ -56,12 +60,16 @@ export function AuthProvider({ children }) {
   // Fetch chat data based on user ID
   async function fetchChat(id) {
     try {
-      const response = await axios.get(
+      const response = await fetch(
         `https://notyourregularai-a10447bffa4b.herokuapp.com/user/chat/${id}`,
-        { withCredentials: true }
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
-      if (response.data.ok) {
-        setChat(response.data.chat.chats);
+      const data = await response.json();
+      if (data.ok) {
+        setChat(data.chat.chats);
       } else {
         setErr("No data found");
         console.log("No data found");
@@ -75,27 +83,29 @@ export function AuthProvider({ children }) {
   async function login(credentials) {
     setLoading(true);
     try {
-      const response = await axios.post(
+      const response = await fetch(
         "https://notyourregularai-a10447bffa4b.herokuapp.com/user/login",
-        credentials, // Request payload
         {
-          withCredentials: true,
+          method: "POST",
+          credentials: "include",
           headers: {
-            "Content-Type": "application/json", // Set content type
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify(credentials),
         }
       );
-  
-      if (response.data.ok) {
+      const data = await response.json();
+
+      if (data.ok) {
         setUser({
           email: credentials.email,
-          name: response.data.name,
-          chatHistory: response.data.chatHistory,
+          name: data.name,
+          chatHistory: data.chatHistory,
         });
         setIsLoggedIn(true);
         navigate("/"); // Navigate to the home page
       } else {
-        console.log("Could not fetch the data", response.data.message);
+        console.log("Could not fetch the data", data.message);
         setIsLoggedIn(false);
         setErr("Check your credentials again");
       }
@@ -143,16 +153,20 @@ export function AuthProvider({ children }) {
   async function logout() {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await fetch(
         "https://notyourregularai-a10447bffa4b.herokuapp.com/user/logout",
-        { withCredentials: true }
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
+      const data = await response.json();
 
-      if (response.data.ok) {
+      if (data.ok) {
         setUser(null);
         setIsLoggedIn(false);
       } else {
-        console.log(response.data.message);
+        console.log(data.message);
       }
     } catch (err) {
       console.log("ERROR logging out", err);
@@ -166,12 +180,16 @@ export function AuthProvider({ children }) {
   async function handleDelete(id) {
     setLoading(true);
     try {
-      const response = await axios.delete(
+      const response = await fetch(
         `https://notyourregularai-a10447bffa4b.herokuapp.com/user/delete/${id}`,
-        { withCredentials: true }
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
       );
+      const data = await response.json();
 
-      if (response.data.ok) {
+      if (data.ok) {
         setUser((prevUser) => {
           const updatedChats = prevUser?.savedChats?.filter(
             (chat) => chat._id !== id
